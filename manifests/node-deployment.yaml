@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment                                          # 1
+metadata:
+  name: node-app
+  labels:
+    app: node-app
+spec:
+  selector:
+    matchLabels:
+      app: node-app
+  replicas: 2                                             # 2
+  minReadySeconds: 15
+  strategy:
+    type: RollingUpdate                                   # 3
+    rollingUpdate: 
+      maxUnavailable: 1                                   # 4
+      maxSurge: 1                                         # 5
+  template:
+    metadata:
+      labels:
+        app: node-app                                # 6
+        app.kubernetes.io/name: node-app        # kyverno policy - 1
+        purpose: devsecops                      # kyverno policy - 5
+        namespace: devsecops-project            # kyverno policy - 2
+
+    spec:
+      containers:
+        - image: sanketlawande1/node-app:latest   # kyverno policy - 3
+          imagePullPolicy: IfNotPresent                         # 7
+          name: node-app
+          ports:
+            - containerPort: 80
